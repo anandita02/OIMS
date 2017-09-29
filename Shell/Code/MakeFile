@@ -1,0 +1,21 @@
+# TARGET = name of executable you want to create 
+TARGET=myexecutable
+# If you are using gcc to compile then make CC=gcc
+CC=g++
+# list of headerfiles space seperated
+HEADERS=headerfiles.h
+#flags 
+FLAGS=-Wall
+# you can add flags like this: FLAGS += -std=c++0x
+
+#list of object files that you want to create[space seperated].
+OBJS=inTostring.o load_history.o main_parse.o pipemodule.o stringToint.o execvmodule.o stringToint.o builtinmodule.o
+
+$(TARGET) : $(OBJS) $(HEADERS)
+	$(CC) $(FLAGS) -o $@ $^
+%.o : %.c 
+	$(CC) $(FLAGS) -c -o $@ $^
+
+# clean the build, removes all .o files and executable named in TARGET. To execute run make clean from command line
+clean : 
+	rm *.o $(TARGET)
