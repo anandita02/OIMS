@@ -1,0 +1,8 @@
+{{extend 'layout.html'}}
+<div class="row">
+  <h4>
+    <span class="glyphicon glyphicon glyphicon-tasks" aria-hidden="true"></span>
+     Your Past Orders
+  </h4>
+</div>
+<hr/>

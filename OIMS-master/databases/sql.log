@@ -1,0 +1,140 @@
+timestamp: 2015-10-28T11:13:56.332769
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+success!
+timestamp: 2015-10-28T11:13:56.590397
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2015-10-28T11:13:57.202649
+CREATE TABLE auth_membership(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE  
+);
+success!
+timestamp: 2015-10-28T11:13:57.673544
+CREATE TABLE auth_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE  ,
+    name CHAR(512),
+    table_name CHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2015-10-28T11:13:58.065654
+CREATE TABLE auth_event(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time_stamp TIMESTAMP,
+    client_ip CHAR(512),
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
+    origin CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2015-10-28T11:13:58.278347
+CREATE TABLE auth_cas(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
+    created_on TIMESTAMP,
+    service CHAR(512),
+    ticket CHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2017-03-26T23:18:34.798880
+CREATE TABLE company(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_url CHAR(512) NOT NULL UNIQUE,
+    company_name CHAR(512),
+    admin_emp_id CHAR(512),
+    admin_first_name CHAR(512),
+    admin_last_name CHAR(512),
+    date_of_birth DATE,
+    email CHAR(512),
+    password CHAR(512)
+);
+success!
+timestamp: 2017-03-26T23:18:36.315787
+ALTER TABLE auth_user ADD company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ;
+timestamp: 2017-03-26T23:18:36.881922
+ALTER TABLE auth_user ADD date_of_birth DATE;
+timestamp: 2017-03-26T23:18:37.283154
+ALTER TABLE auth_user ADD emp_id CHAR(512);
+success!
+success!
+success!
+<<<<<<< HEAD
+timestamp: 2017-03-28T23:09:14.674600
+CREATE TABLE locations(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ,
+    location_name CHAR(512),
+    location_address CHAR(512),
+    location_city CHAR(512),
+    location_country CHAR(512),
+    location_zip_code CHAR(512),
+    person_incharge INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
+    phone_number CHAR(512)
+);
+success!
+timestamp: 2017-03-29T13:00:40.428469
+=======
+timestamp: 2017-03-28T20:27:18.626322
+>>>>>>> 3d8538d8f89a00e455a3b550bbbd1192905feaaa
+CREATE TABLE event_log(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ,
+    event_owner_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
+    event_time TIMESTAMP,
+    event_type CHAR(512),
+    event_desc CHAR(512)
+);
+success!
+<<<<<<< HEAD
+=======
+timestamp: 2017-03-30T16:31:28.161389
+CREATE TABLE inventory_item_type(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ,
+    name CHAR(512),
+    type_desc CHAR(512)
+);
+success!
+timestamp: 2017-03-30T16:31:52.775201
+CREATE TABLE inventory_item(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ,
+    name CHAR(512),
+    item_desc CHAR(512),
+    default_purchase_price INTEGER,
+    default_selling_price INTEGER,
+    sku INTEGER,
+    item_type INTEGER REFERENCES inventory_item_type (id) ON DELETE CASCADE  ,
+    quantity INTEGER,
+    lowest_inventory_threshold INTEGER
+);
+success!
+timestamp: 2017-03-30T20:14:31.792372
+CREATE TABLE category(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER REFERENCES company (id) ON DELETE CASCADE  ,
+    name CHAR(512),
+    cat_desc CHAR(512)
+);
+success!
+timestamp: 2017-03-30T20:14:32.113010
+ALTER TABLE inventory_item ADD cat_id INTEGER REFERENCES category (id) ON DELETE CASCADE  ;
+success!
+>>>>>>> 3d8538d8f89a00e455a3b550bbbd1192905feaaa

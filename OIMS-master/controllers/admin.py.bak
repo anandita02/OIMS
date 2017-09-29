@@ -1,0 +1,141 @@
+# -*- coding: utf-8 -*-
+##########################################################################
+## This is a admin controller
+## - registerCompany is for registering company on OIMS
+##########################################################################
+def registerCompanyValidation(form):
+    company_url_list = db(db.company.company_url==form.vars.company_url).select().as_list()
+    if len(company_url_list) != 0:
+        form.errors.company_url = "Company URL is already registered !"
+
+def registerCompany():
+    form = SQLFORM.factory(
+           Field('company_url','string' ,requires=IS_NOT_EMPTY()),
+           Field('company_name','string',requires=IS_NOT_EMPTY()),
+           Field('admin_emp_id','string',requires=IS_NOT_EMPTY()),
+           Field('admin_first_name','string',requires=IS_NOT_EMPTY()),
+           Field('admin_last_name','string',requires=IS_NOT_EMPTY()),
+           Field('date_of_birth','date',requires=IS_DATE(format=T('%Y-%m-%d'), error_message='must be YYYY-MM-DD!')),
+           Field('email',requires=IS_EMAIL()),
+           Field('password','password',requires=CRYPT(min_length=8)))
+
+    if form.process(onvalidation=registerCompanyValidation,message_onfailure="Please fill all values correctly!").accepted:
+        new_company_id=db.company.insert(company_url=form.vars.company_url,
+                                         company_name=form.vars.company_name,
+                                         admin_emp_id=form.vars.admin_emp_id,
+                                         admin_first_name=form.vars.admin_first_name,
+                                         admin_last_name=form.vars.admin_last_name,
+                                         date_of_birth=form.vars.date_of_birth,
+                                         email=form.vars.email,
+                                         password=form.vars.password)
+        session.company_id = new_company_id
+        new_user_id=db.auth_user.insert( first_name=form.vars.admin_first_name,
+                                         last_name=form.vars.admin_last_name,
+                                         emp_id=form.vars.admin_emp_id,
+                                         date_of_birth=form.vars.date_of_birth,
+                                         email=form.vars.email,
+                                         password=form.vars.password,
+                                         company_id=new_company_id)
+
+        admin_group_id = ROLE_DICT['Admin']
+        auth.add_membership(admin_group_id, new_user_id)
+
+        redirect(URL('admin','index'))
+    elif form.errors:
+        response.flash = "Please fill the form correctly !"
+
+    return dict(form=form)
+
+def generateRandomPassword():
+    import string
+    import random
+    password = ''
+    for i in range(3):
+        password += random.choice(string.lowercase)
+        password += random.choice(string.uppercase)
+        password += random.choice(string.digits)
+
+    return password
+
+def sendMail(reciever,subject,message):
+
+    if subject == "Welcome to OIMS":
+        message = "Welcome to OIMS. You are now registered user to OIMS." + message
+
+    return mail.send(to=[reciever],
+              subject=subject,
+              reply_to="utsav.chokshi.29@gmail.com",
+              message=message)
+
+def createUserValidation(form):
+    
+    rows = db(db.auth_user.company_id==session.company_id and
+              db.auth_user.email==form.vars.email).select().as_list()
+
+    if len(rows) != 0:
+        form.errors.email = "Email Address is already in use!"
+    
+    rows =  db(db.auth_user.company_id==session.company_id and
+               db.auth_user.emp_id==form.vars.emp_id).select().as_list()
+
+    if len(rows) != 0:
+        form.errors.emp_id = "Emp ID already assigned!"
+
+@auth.requires_membership("Admin")
+def createUser():
+    #Send mail to user
+    #Add entry in the activity log
+    #Redirect to admin/index
+
+    #Preparing Fields array for Form
+    fields = [field for field in db.auth_user if field.name != 'company_id' and field.name != 'password']
+    fields += [Field('role', requires=IS_IN_SET(ROLE_DICT.keys()))]
+    company_id = session.company_id
+    password = generateRandomPassword()
+
+    form = SQLFORM.factory(*fields, submit_button="Create")
+
+    if form.process(onvalidation=createUserValidation,message_onfailure="Please fill form correctly!").accepted:
+        
+        new_user_id = db.auth_user.insert(first_name=form.vars.first_name,
+                                          last_name=form.vars.last_name,
+                                          emp_id=form.vars.emp_id,
+                                          date_of_birth=form.vars.date_of_birth,
+                                          email=form.vars.email,
+                                          password=CRYPT(password),
+                                          company_id=company_id)
+        group_id = ROLE_DICT[form.vars.role]
+        auth.add_membership(group_id, new_user_id)
+    
+        msg = "Your Credentials: Email : " + form.vars.email + "Password: " + password
+        status = sendMail(form.vars.email,"Welcome to OIMS",msg)
+
+    return dict(form=form)
+
+@auth.requires_membership("Admin")
+def viewUsers():
+    return "View Users"
+
+@auth.requires_membership("Admin")
+def editUsers():
+    return "Edit Users"
+
+@auth.requires_membership("Admin")
+def createLocation():
+    return "Create Location"
+
+@auth.requires_membership("Admin")
+def viewLocations():
+    return "View Locations"
+
+@auth.requires_membership("Admin")
+def editLocation():
+    return "Edit Location"
+
+@auth.requires_membership("Admin")
+def profile():
+    return "Profile"
+
+@auth.requires_membership("Admin")
+def index():
+    return dict(msg="hi")

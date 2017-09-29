@@ -1,0 +1,47 @@
+{{extend 'layout.html'}}
+<div class="row">
+  <h4>
+    <span class="glyphicon glyphicon glyphicon-tasks" aria-hidden="true"></span>
+     Your Recent Activities
+  </h4>
+</div>
+<hr/>
+<div class="col-md-5">
+	<table class="table table-hover" >
+	<thead>
+	      <tr>
+	        <th colspan="3">
+	        	User Activities
+	        </th>
+	      </tr>
+	</thead>
+	<tbody>
+		{{for i in event_user_list:}}
+		<tr>
+			<td> {{=str(i['event_time'])[:10]}} </td>
+			<td> {{=str(i['event_time'])[10:]}} </td>
+			<td> {{=i['event_desc']}} </td>
+		</tr>
+		{{pass}}
+	</tbody>
+	</table>
+</div>
+<div class="col-md-1"></div>
+<div class="col-md-6">
+	<table class="table table-hover" >
+	<thead>
+	      <tr>
+	        <th colspan="3">
+	        	Location Activities
+	        </th>
+	      </tr>
+	</thead>
+	<tbody>
+		{{for i in event_location_list:}}
+			<td> {{=i['event_time'][:10]}} </td>
+			<td> {{=i['event_time'][10:]}} </td>
+			<td> {{=i['event_desc']}} </td>
+		{{pass}}
+	</tbody>
+	</table>
+</div>

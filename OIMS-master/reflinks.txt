@@ -1,0 +1,6 @@
+Forms and validators:
+http://www.web2py.com/books/default/chapter/29/07/forms-and-validators
+
+To open Web2py database console :
+cd [location of web2py.py]
+python web2py.py -M -S [applicaiton name]
